@@ -20,12 +20,14 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
+        
         if (hit)
         {
             return;
         }
-
+        // Move the projectile
         MoveProjectile();
+        // Check the lifetime of the projectile
         CheckLifetime();
     }
 
@@ -70,7 +72,7 @@ public class Projectile : MonoBehaviour
         {
             localScaleX = -localScaleX; // Flip the projectile if necessary
         }
-
+        // Apply the new local scale
         transform.localScale = new Vector3(localScaleX, transform.localScale.y, transform.localScale.z);
     }
 

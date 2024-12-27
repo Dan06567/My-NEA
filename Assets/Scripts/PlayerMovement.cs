@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
     private float wallJumpCooldown; // Cooldown timer for wall jumping
     private float horizontalInput; // Horizontal movement input from the player
 
+
+    // Constants for wall jumping and movement
     private const float wallJumpCooldownTime = 0.2f;
     private const float speedMultiplier = 1.7f;
     private const float gravityScale = 2f;
@@ -27,12 +29,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        // Handle player input and animations
         InputMovement();
         HandleAnimation();
     }
 
+    //fixed update for physics
     private void FixedUpdate()
     {
+        // Handle player movement and wall jumping
         HandleMovement();
         HandleWallJump();
     }
@@ -57,14 +62,16 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            Jump();
+            Jump();// Jump if the player presses the space key
         }
     }
 
     private void HandleMovement()
     {
+        // Move the player horizontally based on the input
         body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y);
 
+        // Flip the player sprite based on the movement direction
         if (horizontalInput > 0.01f)
         {
             transform.localScale = Vector3.one;
@@ -75,12 +82,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    //player animations
     private void HandleAnimation()
     {
         anim.SetBool("run", horizontalInput != 0);
         anim.SetBool("grounded", Grounded());
     }
 
+    //wall jump
     private void HandleWallJump()
     {
         if (wallJumpCooldown > wallJumpCooldownTime)
@@ -101,13 +110,16 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    //jump
     private void Jump()
     {
+        // Jump if the player is grounded
         if (Grounded())
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpPower);
             anim.SetTrigger("jump");
         }
+        // Wall jump if the player is touching a wall
         else if (Wall() && !Grounded())
         {
             if (horizontalInput == 0)
@@ -119,13 +131,14 @@ public class PlayerMovement : MonoBehaviour
             {
                 body.linearVelocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 3, 6);
             }
-
+            // Reset the wall jump cooldown
             wallJumpCooldown = 0;
         }
     }
 
     private bool Grounded()
     {
+        // Check if the player is grounded using a boxcast
         RaycastHit2D raycastHit = Physics2D.BoxCast(
             boxCollider.bounds.center,
             boxCollider.bounds.size,
@@ -134,11 +147,12 @@ public class PlayerMovement : MonoBehaviour
             0.1f,
             groundLayer
         );
+        // Return true if the boxcast hits the ground layer
         return raycastHit.collider != null;
     }
 
     private bool Wall()
-    {
+    { // Check if the player is touching a wall using a boxcast
         RaycastHit2D raycastHit = Physics2D.BoxCast(
             boxCollider.bounds.center,
             boxCollider.bounds.size,
@@ -147,6 +161,7 @@ public class PlayerMovement : MonoBehaviour
             0.1f,
             wallLayer
         );
+        // Return true if the boxcast hits the wall layer
         return raycastHit.collider != null;
     }
 
