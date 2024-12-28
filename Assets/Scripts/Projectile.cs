@@ -41,10 +41,10 @@ public class Projectile : MonoBehaviour
     private void CheckLifetime()
     {
         // Increment lifetime and deactivate the projectile after maxLifetime seconds
-        lifetime += Time.deltaTime;
-        if (lifetime > maxLifetime)
+        lifetime += Time.deltaTime; // Increment the lifetime timer
+        if (lifetime > maxLifetime) // Check if the lifetime has exceeded the maximum
         {
-            Deactivate();
+            Deactivate(); // Deactivate the projectile
         }
     }
 

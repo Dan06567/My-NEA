@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void InputMovement()
     {
-        horizontalInput = 0f;
+        horizontalInput = 0f; // horizontal input
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -92,21 +92,23 @@ public class PlayerMovement : MonoBehaviour
     //wall jump
     private void HandleWallJump()
     {
+        // Check if the player is touching a wall and not grounded
         if (wallJumpCooldown > wallJumpCooldownTime)
         {
             if (Wall() && !Grounded())
             {
-                body.gravityScale = 0;
-                body.linearVelocity = Vector2.zero;
+                
+                body.gravityScale = 0; // Disable gravity to allow wall jumping
+                body.linearVelocity = Vector2.zero; // Reset the velocity
             }
             else
             {
-                body.gravityScale = gravityScale;
+                body.gravityScale = gravityScale; // Reset the gravity scale
             }
         }
         else
         {
-            wallJumpCooldown += Time.deltaTime;
+            wallJumpCooldown += Time.deltaTime; // Increment the wall jump cooldown
         }
     }
 
@@ -116,20 +118,20 @@ public class PlayerMovement : MonoBehaviour
         // Jump if the player is grounded
         if (Grounded())
         {
-            body.linearVelocity = new Vector2(body.linearVelocity.x, jumpPower);
-            anim.SetTrigger("jump");
+            body.linearVelocity = new Vector2(body.linearVelocity.x, jumpPower); // Apply jump force
+            anim.SetTrigger("jump"); // Trigger the jump animation
         }
         // Wall jump if the player is touching a wall
         else if (Wall() && !Grounded())
         {
             if (horizontalInput == 0)
             {
-                body.linearVelocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 10, 0);
-                transform.localScale = new Vector3(-Mathf.Sign(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+                body.linearVelocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 10, 0); // Jump off
+                transform.localScale = new Vector3(-Mathf.Sign(transform.localScale.x), transform.localScale.y, transform.localScale.z); // Flip the player
             }
             else
             {
-                body.linearVelocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 3, 6);
+                body.linearVelocity = new Vector2(-Mathf.Sign(transform.localScale.x) * 3, 6); // Jump off
             }
             // Reset the wall jump cooldown
             wallJumpCooldown = 0;
