@@ -20,7 +20,7 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        
+        // Update the projectile's movement and lifetime
         if (hit)
         {
             return;
