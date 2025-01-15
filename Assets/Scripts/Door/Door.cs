@@ -18,8 +18,6 @@ public class Door : MonoBehaviour
     // Flag to indicate if the door is unlocked
     private bool isUnlocked = false;
 
-    // Reference to the Animator component
-    private Animator animator;
 
     private void Start()
     {
@@ -41,14 +39,15 @@ public class Door : MonoBehaviour
     {
         if (doorSprite != null)
         {
-            // Set the door's color based on its locked/unlocked status
-            doorSprite.color = isUnlocked ? unlockedColor : lockedColor;
-        }
-
-        // If an Animator component is present, update the door's animation state
-        if (animator != null)
-        {
-            animator.SetBool("Unlocked", isUnlocked);
+            // If the door is unlocked, set its color to the unlocked color, otherwise set it to the locked color
+            if (isUnlocked)
+            {
+                doorSprite.color = unlockedColor;
+            }
+            else
+            {
+                doorSprite.color = lockedColor;
+            }
         }
     }
 
@@ -71,19 +70,6 @@ public class Door : MonoBehaviour
             // Load the specified next level scene
             SceneManager.LoadScene(nextLevelName);
         }
-        else
-        {
-            // Try to load the next level by index
-            int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
-            if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
-            {
-                SceneManager.LoadScene(nextSceneIndex);
-            }
-            else
-            {
-                // Log a warning if there is no next level available
-                Debug.LogWarning("No next level available!");
-            }
-        }
+
     }
 }

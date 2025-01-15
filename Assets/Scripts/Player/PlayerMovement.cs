@@ -21,9 +21,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask groundLayer; // Layer mask for ground detection
     [SerializeField] private LayerMask wallLayer; // Layer mask for wall detection
 
-    private Rigidbody2D body; // Reference to the Rigidbody2D component
-    private Animator anim; // Reference to the Animator component
-    private BoxCollider2D boxCollider; // Reference to the BoxCollider2D component
+    private Rigidbody2D body; // Reference to the Rigidbody2D component on the player (Unity's physics system)
+    private Animator anim; // Reference to the Animator component unity's animation system
+    private BoxCollider2D boxCollider; // Reference to the BoxCollider2D component unity's physics system
     private float wallJumpCooldown; // Cooldown timer for wall jumps
     private float horizontalInput; // Horizontal input value
     private int remainingJumps; // Number of remaining jumps
@@ -31,23 +31,29 @@ public class PlayerMovement : MonoBehaviour
     private float jumpBufferCounter; // Counter for jump buffer time
     private bool isJumping; // Flag to check if the player is jumping
     private bool wasGrounded; // Flag to check if the player was grounded
+    public Vector3 respawnPoint; // Respawn point for the player
 
     private const float wallJumpCooldownTime = 0.2f; // Cooldown time for wall jumps
     private const float speedMultiplier = 1.7f; // Speed multiplier when running
     private const float gravityScale = 1f; // Gravity scale for the player
 
+    private Health health; // Reference to the Health component
+
     private void Start()
     {
         // Log the player's initial position
         Debug.Log($"Player initial position: {transform.position}");
+        respawnPoint = transform.position; // Set the respawn point to the player's initial position
     }
+
     private void Awake()
     {
         // Initialize references to components
-        body = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        boxCollider = GetComponent<BoxCollider2D>();
+        body = GetComponent<Rigidbody2D>(); // Get the Rigidbody2D component
+        anim = GetComponent<Animator>(); // Get the Animator component
+        boxCollider = GetComponent<BoxCollider2D>();// Get the BoxCollider2D component
         remainingJumps = maxJumps; // Set remaining jumps to max jumps
+        health = GetComponent<Health>(); // Get the Health component
     }
 
     private void Update()
@@ -56,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
         HandleJumpBuffer(); // Handle jump buffer logic
         InputMovement(); // Handle player input for movement
         HandleAnimation(); // Handle player animations
+        CheckFallOffScreen(); // Check if the player has fallen off the screen
     }
 
     private void FixedUpdate()
@@ -103,12 +110,21 @@ public class PlayerMovement : MonoBehaviour
         horizontalInput = 0f; // Reset horizontal input
 
         if (Input.GetKey(KeyCode.A))
+        {
             horizontalInput = -0.5f; // Move left
+
+        }
         else if (Input.GetKey(KeyCode.D))
+        {
+
             horizontalInput = 0.5f; // Move right
+        }
 
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        {
             horizontalInput *= speedMultiplier; // Increase speed when running
+        }
+
 
         if (jumpBufferCounter > 0f && (coyoteTimeCounter > 0f || remainingJumps > 0))
         {
@@ -126,6 +142,8 @@ public class PlayerMovement : MonoBehaviour
             transform.localScale = Vector3.one; // Face right
         else if (horizontalInput < -0.01f)
             transform.localScale = new Vector3(-1, 1, 1); // Face left
+
+        
     }
 
     private void HandleWallJump()
@@ -185,18 +203,17 @@ public class PlayerMovement : MonoBehaviour
     private bool Grounded()
     {
         float groundCheckDistance = 0.1f; // Distance to check for ground
-        Vector2 boxCenter = new Vector2(boxCollider.bounds.center.x, boxCollider.bounds.min.y); // Center of the box collider
+        Vector2 boxCenter = new Vector2(boxCollider.bounds.center.x, boxCollider.bounds.min.y - 0.05f); // Center of the box collider slightly below the player
         Vector2 boxSize = new Vector2(boxCollider.bounds.size.x * 0.9f, groundCheckDistance); // Size of the box collider
 
-        Collider2D hit = Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundLayer); // Check for ground collision
+        bool isGrounded = Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundLayer) != null; // Check for ground collision
 
-        // If we hit ground and were jumping, reset jump state
-        if (hit != null && isJumping && body.linearVelocity.y <= 0)
+        if (isGrounded && isJumping && body.linearVelocity.y <= 0)
         {
-            isJumping = false; // Set isJumping to false
+            isJumping = false; // Reset jump state if grounded
         }
 
-        return hit != null; // Return if grounded
+        return isGrounded; // Return if grounded
     }
 
     private bool Wall()
@@ -214,4 +231,15 @@ public class PlayerMovement : MonoBehaviour
         // Return true if a wall is detected, false otherwise
         return raycastHit.collider != null;
     }
+
+    // Check if the player has fallen off the screen
+    private void CheckFallOffScreen()
+    {
+        if (transform.position.y < -10) // Check if the player has fallen enough to be considered off screen
+        {
+            health.Respawn(); // Respawn the player using the Health component
+        }
+    }
+
+
 }

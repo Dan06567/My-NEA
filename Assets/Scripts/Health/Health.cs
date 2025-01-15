@@ -6,7 +6,9 @@ public class Health : MonoBehaviour
     [SerializeField] private float initialHealth; // Initial health of the player
     [SerializeField] private float invincibilityDuration = 1.0f; // Duration of invincibility in seconds
     [SerializeField] private Color damageColor = Color.red; // Color when taking damage
-    public float currentHealth { get; private set; } // Current health of the player
+    // Current health of the player , get is used to access the value of currentHealth
+    // set is used to modify the value of currentHealth but only within the class because is private
+    public float currentHealth { get; private set; } 
     private bool dead; // Flag to determine if the player is dead
     private bool isInvincible; // Flag to determine if the player is invincible
     private float invincibilityTimer; // Timer for invincibility duration
@@ -42,7 +44,8 @@ public class Health : MonoBehaviour
         {
             return; // Exit the method early
         }
-
+        //The Mathf.Clamp function ensures that the resulting health value is clamped between 0 
+        //and the initial health (initialHealth), preventing the health from going below 0 or above the initial health.
         currentHealth = Mathf.Clamp(currentHealth - thedamage, 0, initialHealth); // Apply damage to the player
 
         if (currentHealth > 0) // Check if the player is still alive
@@ -58,6 +61,7 @@ public class Health : MonoBehaviour
                 dead = true; // Set the dead flag to true
                 GetComponent<PlayerMovement>().enabled = false; // Disable the PlayerMovement script
                 ChangeColor(damageColor); // Change the player color
+                Respawn(); // Call the Respawn method
             }
         }
     }
@@ -76,6 +80,15 @@ public class Health : MonoBehaviour
         {
             playerRenderer.material.color = originalColor; // Reset the player color
         }
+    }
+
+    public void Respawn() // Method to respawn the player
+    {
+        currentHealth = initialHealth; // Reset the player's health
+        dead = false; // Reset the dead flag
+        GetComponent<PlayerMovement>().enabled = true; // Enable the PlayerMovement script
+        ResetColor(); // Reset the player color
+        transform.position = GetComponent<PlayerMovement>().respawnPoint; // Reset the player's position to the respawn point
     }
 }
 

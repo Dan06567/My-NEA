@@ -55,8 +55,10 @@ public class DoorManager : MonoBehaviour
     // Update the key counter UI text with the current key count
     private void UpdateKeyCounterText()
     {
+        // Update the key counter text with the current key count
         if (keyCounterText != null)
         {
+            // Display the number of keys collected and the total number of keys required
             keyCounterText.text = $"Keys: {keysCollected}/{totalKeysRequired}";
         }
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class enemy_sideways : MonoBehaviour
+public class Spike : MonoBehaviour
 {
     [SerializeField] private float damage; // Damage dealt by the enemy
 
